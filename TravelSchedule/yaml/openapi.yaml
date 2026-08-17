@@ -109,6 +109,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: transfers
+          in: query
+          description: включать маршруты с пересадками
+          required: false
+          schema:
+            type: boolean
       responses:
         '200':
           description: success
@@ -477,6 +483,8 @@ components:
           type: string
         logo:
           type: string
+        logo_svg:
+          type: string
         email:
           type: string
         codes:
@@ -511,6 +519,10 @@ components:
           type: string
         duration:
           type: number
+        has_transfers:
+          type: boolean
+        start_date:
+          type: string
     SearchResponse:
       type: object
       properties:

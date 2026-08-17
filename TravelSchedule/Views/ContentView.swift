@@ -9,41 +9,61 @@ import SwiftUI
 import OpenAPIURLSession
 
 struct ContentView: View {
+    @State private var testTask: Task<Void, Never>?
+
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+            Button("Запустить тесты API") {
+                runTests()
+            }
         }
         .padding()
-        .onAppear {
-            testAllServices()
+        .onDisappear {
+            testTask?.cancel()
+            testTask = nil
+        }
+    }
+
+    private func runTests() {
+        testTask?.cancel()
+        testTask = Task {
+            do {
+                try await testAllServices()
+            } catch is CancellationError {
+                print("API tests cancelled")
+            } catch {
+                print("Error during API tests: \(error)")
+            }
         }
     }
 }
 
-func testAllServices() {
-    Task {
-        do {
-            let client = Client(
-                serverURL: try Servers.Server1.url(),
-                transport: URLSessionTransport()
-            )
-            let apikey = ApiKey.yandexRasp
+func testAllServices() async throws {
+    let client = Client(
+        serverURL: try Servers.Server1.url(),
+        transport: URLSessionTransport()
+    )
+    let apikey = ApiKey.yandexRasp
 
-            try await testFetchNearestStations(client: client, apikey: apikey)
-            try await testFetchStationsList(client: client, apikey: apikey)
-            try await testFetchScheduleBetweenStations(client: client, apikey: apikey)
-            try await testFetchScheduleOnStation(client: client, apikey: apikey)
-            try await testFetchThread(client: client, apikey: apikey)
-            try await testFetchCarrier(client: client, apikey: apikey)
-            try await testFetchCopyright(client: client, apikey: apikey)
-            try await testFetchNearestSettlement(client: client, apikey: apikey)
-        } catch {
-            print("Error during API tests: \(error)")
-        }
-    }
+    try await testFetchNearestStations(client: client, apikey: apikey)
+    try Task.checkCancellation()
+    try await testFetchStationsList(client: client, apikey: apikey)
+    try Task.checkCancellation()
+    try await testFetchScheduleBetweenStations(client: client, apikey: apikey)
+    try Task.checkCancellation()
+    try await testFetchScheduleOnStation(client: client, apikey: apikey)
+    try Task.checkCancellation()
+    try await testFetchThread(client: client, apikey: apikey)
+    try Task.checkCancellation()
+    try await testFetchCarrier(client: client, apikey: apikey)
+    try Task.checkCancellation()
+    try await testFetchCopyright(client: client, apikey: apikey)
+    try Task.checkCancellation()
+    try await testFetchNearestSettlement(client: client, apikey: apikey)
 }
 
 func testFetchNearestStations(client: Client, apikey: String) async throws {
