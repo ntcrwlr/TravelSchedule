@@ -1,6 +1,6 @@
 import Foundation
 
-struct RoutePoint: Hashable, Identifiable {
+struct Station: Hashable, Identifiable {
     let id: String
     let title: String
 }

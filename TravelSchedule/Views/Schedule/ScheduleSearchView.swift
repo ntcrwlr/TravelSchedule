@@ -64,7 +64,7 @@ struct ScheduleSearchView: View {
     private var searchCard: some View {
         HStack(spacing: 16) {
             VStack(spacing: 0) {
-                stationRow(point: from, placeholder: "Откуда") {
+                stationRow(point: from, placeholder: AppStrings.from) {
                     path.append(ScheduleRoute.citySearch(.from))
                 }
 
@@ -73,7 +73,7 @@ struct ScheduleSearchView: View {
                     .frame(height: 1)
                     .padding(.horizontal, 16)
 
-                stationRow(point: to, placeholder: "Куда") {
+                stationRow(point: to, placeholder: AppStrings.to) {
                     path.append(ScheduleRoute.citySearch(.to))
                 }
             }
@@ -88,7 +88,7 @@ struct ScheduleSearchView: View {
                     .background(Circle().fill(AppColor.white))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Поменять местами")
+            .accessibilityLabel(AppStrings.swapStations)
         }
         .padding(16)
         .background(AppColor.blue)
@@ -100,7 +100,7 @@ struct ScheduleSearchView: View {
             carriersViewModel.configure(from: from, to: to)
             path.append(ScheduleRoute.carriers)
         } label: {
-            Text("Найти")
+            Text(AppStrings.find)
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(AppColor.white)
                 .frame(width: 150, height: 60)

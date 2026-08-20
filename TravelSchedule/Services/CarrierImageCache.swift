@@ -27,7 +27,7 @@ final class CarrierImageCache {
 
         let loaded = await Task.detached(priority: .userInitiated) {
             guard let (data, response) = try? await URLSession.shared.data(from: url),
-                  (response as? HTTPURLResponse)?.statusCode == 200,
+                  (response as? HTTPURLResponse)?.statusCode == HTTPStatusCode.ok,
                   let image = UIImage(data: data)
             else {
                 return nil as UIImage?

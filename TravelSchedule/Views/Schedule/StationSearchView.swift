@@ -13,44 +13,21 @@ struct StationSearchView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            SearchQueryField(text: $query)
-
-            ZStack {
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        ForEach(filteredStations) { station in
-                            Button {
-                                onSelect(station)
-                            } label: {
-                                SelectionRow(title: station.title)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+        SearchListScreen(
+            title: AppStrings.stationSearchTitle,
+            emptyMessage: AppStrings.stationNotFound,
+            isEmpty: filteredStations.isEmpty,
+            query: $query
+        ) {
+            ForEach(filteredStations) { station in
+                Button {
+                    onSelect(station)
+                } label: {
+                    SelectionRow(title: station.title)
                 }
-                .scrollDismissesKeyboard(.immediately)
-                .opacity(filteredStations.isEmpty ? 0 : 1)
-                .allowsHitTesting(!filteredStations.isEmpty)
-
-                Text("Станция не найдена")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(AppColor.text)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 16)
-                    .opacity(filteredStations.isEmpty ? 1 : 0)
-                    .allowsHitTesting(false)
+                .buttonStyle(.plainList)
             }
         }
-        .background(AppColor.background)
-        .appErrorOverlay()
-        .navigationTitle("Выбор станции")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.visible, for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
-        .toolbarBackground(AppColor.background, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .tint(AppColor.text)
     }
 }
 

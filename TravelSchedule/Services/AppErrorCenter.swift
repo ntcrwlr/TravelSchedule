@@ -13,6 +13,15 @@ final class AppErrorCenter: ObservableObject {
     private let monitor = NWPathMonitor()
 
     private init() {
+        setupMonitor()
+    }
+
+    func report(_ error: AppLoadError?) {
+        requestError = error
+        publish()
+    }
+
+    private func setupMonitor() {
         monitor.pathUpdateHandler = { [weak self] path in
             let offline = path.status != .satisfied
             Task { @MainActor in
@@ -21,11 +30,6 @@ final class AppErrorCenter: ObservableObject {
             }
         }
         monitor.start(queue: DispatchQueue(label: "ru.practicum.travelschedule.network"))
-    }
-
-    func report(_ error: AppLoadError?) {
-        requestError = error
-        publish()
     }
 
     private func publish() {

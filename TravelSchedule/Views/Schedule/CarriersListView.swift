@@ -57,7 +57,7 @@ struct CarriersListView: View {
             ProgressView()
                 .opacity(viewModel.isLoading ? 1 : 0)
 
-            Text("Вариантов нет")
+            Text(AppStrings.noVariants)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundStyle(AppColor.text)
                 .opacity(isEmptyState ? 1 : 0)
@@ -74,7 +74,7 @@ struct CarriersListView: View {
             path.append(ScheduleRoute.timeFilter)
         } label: {
             HStack(spacing: 4) {
-                Text("Уточнить время")
+                Text(AppStrings.refineTime)
                     .font(.system(size: 17, weight: .bold))
                     .foregroundStyle(AppColor.white)
                 Circle()

@@ -35,7 +35,7 @@ final class CarrierService: CarrierServiceProtocol {
         guard let url = components?.url else { return nil }
 
         guard let (data, response) = try? await URLSession.shared.data(from: url),
-              (response as? HTTPURLResponse)?.statusCode == 200,
+              (response as? HTTPURLResponse)?.statusCode == HTTPStatusCode.ok,
               let envelope = try? JSONDecoder().decode(RaspCarrierEnvelope.self, from: data)
         else {
             return nil

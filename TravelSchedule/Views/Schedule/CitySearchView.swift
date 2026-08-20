@@ -12,42 +12,19 @@ struct CitySearchView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            SearchQueryField(text: $query)
-
-            ZStack {
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        ForEach(filteredCities) { city in
-                            NavigationLink(value: ScheduleRoute.stationSearch(direction, city)) {
-                                SelectionRow(title: city.title)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+        SearchListScreen(
+            title: AppStrings.citySearchTitle,
+            emptyMessage: AppStrings.cityNotFound,
+            isEmpty: filteredCities.isEmpty,
+            query: $query
+        ) {
+            ForEach(filteredCities) { city in
+                NavigationLink(value: ScheduleRoute.stationSearch(direction, city)) {
+                    SelectionRow(title: city.title)
                 }
-                .scrollDismissesKeyboard(.immediately)
-                .opacity(filteredCities.isEmpty ? 0 : 1)
-                .allowsHitTesting(!filteredCities.isEmpty)
-
-                Text("Город не найден")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(AppColor.text)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 16)
-                    .opacity(filteredCities.isEmpty ? 1 : 0)
-                    .allowsHitTesting(false)
+                .buttonStyle(.plainList)
             }
         }
-        .background(AppColor.background)
-        .appErrorOverlay()
-        .navigationTitle("Выбор города")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.visible, for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
-        .toolbarBackground(AppColor.background, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .tint(AppColor.text)
     }
 }
 

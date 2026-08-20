@@ -16,9 +16,10 @@ final class CarriersListViewModel: ObservableObject {
     }
 
     var routeTitle: String {
-        let fromTitle = from?.title ?? "Откуда"
-        let toTitle = to?.title ?? "Куда"
-        return "\(fromTitle) → \(toTitle)"
+        AppStrings.routeTitle(
+            from: from?.title ?? AppStrings.from,
+            to: to?.title ?? AppStrings.to
+        )
     }
 
     init(from: RoutePoint? = nil, to: RoutePoint? = nil) {
