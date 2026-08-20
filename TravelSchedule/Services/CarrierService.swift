@@ -24,4 +24,24 @@ final class CarrierService: CarrierServiceProtocol {
         ))
         return try response.ok.body.json
     }
+
+    static func fetchLogoURL(code: String, apikey: String) async -> URL? {
+        var components = URLComponents(string: "https://api.rasp.yandex.net/v3.0/carrier/")
+        components?.queryItems = [
+            URLQueryItem(name: "apikey", value: apikey),
+            URLQueryItem(name: "code", value: code),
+            URLQueryItem(name: "format", value: "json")
+        ]
+        guard let url = components?.url else { return nil }
+
+        guard let (data, response) = try? await URLSession.shared.data(from: url),
+              (response as? HTTPURLResponse)?.statusCode == 200,
+              let envelope = try? JSONDecoder().decode(RaspCarrierEnvelope.self, from: data)
+        else {
+            return nil
+        }
+
+        let carrier = envelope.carrier
+        return carrier?.rasterLogoPath?.httpsURL
+    }
 }
