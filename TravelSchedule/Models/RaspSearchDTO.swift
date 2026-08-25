@@ -80,12 +80,18 @@ struct RaspCarrierDTO: Decodable {
     let logo: String?
     let logoSVG: String?
     let code: String?
+    let email: String?
+    let phone: String?
+    let url: String?
 
     enum CodingKeys: String, CodingKey {
         case title
         case logo
         case logoSVG = "logo_svg"
         case code
+        case email
+        case phone
+        case url
     }
 
     var logoPath: String? {
@@ -101,11 +107,26 @@ struct RaspCarrierDTO: Decodable {
         return logo
     }
 
+    var details: CarrierDetails? {
+        guard let code else { return nil }
+        return CarrierDetails(
+            code: code,
+            title: title ?? AppStrings.carrierFallback,
+            logoURL: rasterLogoPath?.httpsURL,
+            email: email.flatMap { $0.isEmpty ? nil : $0 },
+            phone: phone.flatMap { $0.isEmpty ? nil : $0 },
+            website: url.flatMap { $0.isEmpty ? nil : $0 }
+        )
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         title = try container.decodeIfPresent(String.self, forKey: .title)
         logo = try container.decodeIfPresent(String.self, forKey: .logo)
         logoSVG = try container.decodeIfPresent(String.self, forKey: .logoSVG)
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+        phone = try container.decodeIfPresent(String.self, forKey: .phone)
+        url = try container.decodeIfPresent(String.self, forKey: .url)
         if let intCode = try? container.decode(Int.self, forKey: .code) {
             code = String(intCode)
         } else {

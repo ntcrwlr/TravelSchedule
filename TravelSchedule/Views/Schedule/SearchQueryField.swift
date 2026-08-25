@@ -9,7 +9,7 @@ struct SearchQueryField: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(AppColor.gray)
 
-            TextField("Введите запрос", text: $text)
+            TextField(AppStrings.searchPlaceholder, text: $text)
                 .foregroundStyle(AppColor.text)
                 .focused($isFocused)
                 .tint(AppColor.text)
@@ -39,12 +39,12 @@ struct SelectionRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.system(size: 17))
+                .font(AppTypography.body)
                 .foregroundStyle(AppColor.text)
                 .lineLimit(1)
             Spacer()
             Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .semibold))
+                .font(AppTypography.chevron)
                 .foregroundStyle(AppColor.gray)
         }
         .padding(.horizontal, 16)

@@ -26,22 +26,31 @@ final class CarrierService: CarrierServiceProtocol {
     }
 
     static func fetchLogoURL(code: String, apikey: String) async -> URL? {
+        try? await fetchDetails(code: code, apikey: apikey).logoURL
+    }
+
+    static func fetchDetails(code: String, apikey: String) async throws -> CarrierDetails {
         var components = URLComponents(string: "https://api.rasp.yandex.net/v3.0/carrier/")
         components?.queryItems = [
             URLQueryItem(name: "apikey", value: apikey),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "format", value: "json")
         ]
-        guard let url = components?.url else { return nil }
-
-        guard let (data, response) = try? await URLSession.shared.data(from: url),
-              (response as? HTTPURLResponse)?.statusCode == 200,
-              let envelope = try? JSONDecoder().decode(RaspCarrierEnvelope.self, from: data)
-        else {
-            return nil
+        guard let url = components?.url else {
+            throw URLError(.badURL)
         }
 
-        let carrier = envelope.carrier
-        return carrier?.rasterLogoPath?.httpsURL
+        let (data, response) = try await URLSession.shared.data(from: url)
+        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+
+        guard statusCode == HTTPStatusCode.ok else {
+            throw URLError(.badServerResponse)
+        }
+
+        let envelope = try JSONDecoder().decode(RaspCarrierEnvelope.self, from: data)
+        guard let details = envelope.carrier?.details else {
+            throw URLError(.cannotDecodeContentData)
+        }
+        return details
     }
 }

@@ -35,7 +35,7 @@ struct RouteFilterView: View {
 
     private var timeSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Время отправления")
+            Text(AppStrings.departureTime)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundStyle(AppColor.text)
 
@@ -60,12 +60,12 @@ struct RouteFilterView: View {
 
     private var transfersSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Показывать варианты с пересадками")
+            Text(AppStrings.showTransfers)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundStyle(AppColor.text)
 
-            transferRow(title: "Да", value: true)
-            transferRow(title: "Нет", value: false)
+            transferRow(title: AppStrings.yes, value: true)
+            transferRow(title: AppStrings.no, value: false)
         }
     }
 
@@ -91,7 +91,7 @@ struct RouteFilterView: View {
             onApply(draft)
             dismiss()
         } label: {
-            Text("Применить")
+            Text(AppStrings.apply)
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(AppColor.white)
                 .frame(maxWidth: .infinity)

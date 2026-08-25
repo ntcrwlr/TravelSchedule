@@ -62,11 +62,11 @@ final class ScheduleBetweenStationsService: ScheduleBetweenStationsServiceProtoc
         let (data, response) = try await URLSession.shared.data(from: url)
         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
 
-        if statusCode == 404 || statusCode == 400 {
+        if statusCode == HTTPStatusCode.notFound || statusCode == HTTPStatusCode.badRequest {
             return []
         }
 
-        guard statusCode == 200 else {
+        guard statusCode == HTTPStatusCode.ok else {
             throw URLError(.badServerResponse)
         }
 

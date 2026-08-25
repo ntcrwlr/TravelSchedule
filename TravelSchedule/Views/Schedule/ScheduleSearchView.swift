@@ -5,14 +5,27 @@ struct ScheduleSearchView: View {
     @State private var to: RoutePoint?
     @State private var path = NavigationPath()
     @StateObject private var carriersViewModel = CarriersListViewModel()
+    @ObservedObject private var storiesStore = StoriesStore.shared
+    @State private var presentedStoryID: Int?
 
     private var canFind: Bool {
         from != nil && to != nil
     }
 
+    private var isStoriesPresented: Binding<Bool> {
+        Binding(
+            get: { presentedStoryID != nil },
+            set: { if !$0 { presentedStoryID = nil } }
+        )
+    }
+
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 16) {
+                StoriesStripView(store: storiesStore, stories: SampleStories.all) { storyID in
+                    presentedStoryID = storyID
+                }
+
                 searchCard
                     .padding(.horizontal, 16)
 
@@ -53,9 +66,21 @@ struct ScheduleSearchView: View {
                     RouteFilterView(filters: carriersViewModel.filters) { applied in
                         carriersViewModel.filters = applied
                     }
-                case .carrierCard:
-                    CarrierDetailsView()
+                case .carrierCard(let code):
+                    CarrierDetailsView(carrierCode: code)
                 }
+            }
+            .fullScreenCover(isPresented: isStoriesPresented) {
+                StoriesViewerView(
+                    stories: SampleStories.all,
+                    startIndex: presentedStoryID ?? 0,
+                    onStoryViewed: { storyID in
+                        storiesStore.markViewed(storyID)
+                    },
+                    onClose: {
+                        presentedStoryID = nil
+                    }
+                )
             }
         }
         .animation(.easeInOut(duration: 0.2), value: canFind)
@@ -64,7 +89,7 @@ struct ScheduleSearchView: View {
     private var searchCard: some View {
         HStack(spacing: 16) {
             VStack(spacing: 0) {
-                stationRow(point: from, placeholder: "Откуда") {
+                stationRow(point: from, placeholder: AppStrings.from) {
                     path.append(ScheduleRoute.citySearch(.from))
                 }
 
@@ -73,7 +98,7 @@ struct ScheduleSearchView: View {
                     .frame(height: 1)
                     .padding(.horizontal, 16)
 
-                stationRow(point: to, placeholder: "Куда") {
+                stationRow(point: to, placeholder: AppStrings.to) {
                     path.append(ScheduleRoute.citySearch(.to))
                 }
             }
@@ -88,7 +113,7 @@ struct ScheduleSearchView: View {
                     .background(Circle().fill(AppColor.white))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Поменять местами")
+            .accessibilityLabel(AppStrings.swapStations)
         }
         .padding(16)
         .background(AppColor.blue)
@@ -100,7 +125,7 @@ struct ScheduleSearchView: View {
             carriersViewModel.configure(from: from, to: to)
             path.append(ScheduleRoute.carriers)
         } label: {
-            Text("Найти")
+            Text(AppStrings.find)
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(AppColor.white)
                 .frame(width: 150, height: 60)

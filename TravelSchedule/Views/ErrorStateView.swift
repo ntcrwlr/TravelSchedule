@@ -10,7 +10,7 @@ struct ErrorStateView: View {
                 .scaledToFit()
                 .frame(width: 223, height: 223)
 
-            Text(error?.title ?? "Ошибка сервера")
+            Text(error?.title ?? AppStrings.serverError)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundStyle(AppColor.text)
                 .multilineTextAlignment(.center)

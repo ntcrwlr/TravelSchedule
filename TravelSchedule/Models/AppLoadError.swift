@@ -16,9 +16,9 @@ enum AppLoadError {
     var title: String {
         switch self {
         case .noInternet:
-            return "Нет интернета"
+            return AppStrings.noInternet
         case .server:
-            return "Ошибка сервера"
+            return AppStrings.serverError
         }
     }
 

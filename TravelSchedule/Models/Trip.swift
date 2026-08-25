@@ -70,7 +70,7 @@ extension Trip {
         }
 
         id = (threadUID ?? UUID().uuidString) + departureString
-        carrierName = carrierTitle ?? "Перевозчик"
+        carrierName = carrierTitle ?? AppStrings.carrierFallback
         self.carrierCode = carrierCode
         logoURL = carrierLogo?.httpsURL
         dateText = Self.dateText(from: departureDate)
@@ -80,9 +80,9 @@ extension Trip {
         self.hasTransfers = hasTransfers ?? (transferTitle != nil)
         if self.hasTransfers {
             if let transferTitle, !transferTitle.isEmpty {
-                transferText = "С пересадкой в \(transferTitle)"
+                transferText = AppStrings.transferPrefix + transferTitle
             } else {
-                transferText = "С пересадкой"
+                transferText = AppStrings.transferFallback
             }
         } else {
             transferText = nil
