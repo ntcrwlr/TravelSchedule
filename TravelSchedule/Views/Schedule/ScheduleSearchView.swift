@@ -5,14 +5,27 @@ struct ScheduleSearchView: View {
     @State private var to: RoutePoint?
     @State private var path = NavigationPath()
     @StateObject private var carriersViewModel = CarriersListViewModel()
+    @ObservedObject private var storiesStore = StoriesStore.shared
+    @State private var presentedStoryID: Int?
 
     private var canFind: Bool {
         from != nil && to != nil
     }
 
+    private var isStoriesPresented: Binding<Bool> {
+        Binding(
+            get: { presentedStoryID != nil },
+            set: { if !$0 { presentedStoryID = nil } }
+        )
+    }
+
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 16) {
+                StoriesStripView(store: storiesStore, stories: SampleStories.all) { storyID in
+                    presentedStoryID = storyID
+                }
+
                 searchCard
                     .padding(.horizontal, 16)
 
@@ -53,9 +66,21 @@ struct ScheduleSearchView: View {
                     RouteFilterView(filters: carriersViewModel.filters) { applied in
                         carriersViewModel.filters = applied
                     }
-                case .carrierCard:
-                    CarrierDetailsView()
+                case .carrierCard(let code):
+                    CarrierDetailsView(carrierCode: code)
                 }
+            }
+            .fullScreenCover(isPresented: isStoriesPresented) {
+                StoriesViewerView(
+                    stories: SampleStories.all,
+                    startIndex: presentedStoryID ?? 0,
+                    onStoryViewed: { storyID in
+                        storiesStore.markViewed(storyID)
+                    },
+                    onClose: {
+                        presentedStoryID = nil
+                    }
+                )
             }
         }
         .animation(.easeInOut(duration: 0.2), value: canFind)

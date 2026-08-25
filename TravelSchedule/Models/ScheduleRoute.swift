@@ -5,5 +5,5 @@ enum ScheduleRoute: Hashable {
     case stationSearch(CitySearchDirection, City)
     case carriers
     case timeFilter
-    case carrierCard
+    case carrierCard(String)
 }

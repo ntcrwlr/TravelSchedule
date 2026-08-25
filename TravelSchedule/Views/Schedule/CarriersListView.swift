@@ -41,11 +41,14 @@ struct CarriersListView: View {
                 LazyVStack(spacing: 8) {
                     ForEach(viewModel.filteredTrips) { trip in
                         Button {
-                            path.append(ScheduleRoute.carrierCard)
+                            if let code = trip.carrierCode {
+                                path.append(ScheduleRoute.carrierCard(code))
+                            }
                         } label: {
                             CarrierCardView(trip: trip)
                         }
                         .buttonStyle(.plain)
+                        .disabled(trip.carrierCode == nil)
                     }
                 }
                 .padding(.horizontal, 16)
