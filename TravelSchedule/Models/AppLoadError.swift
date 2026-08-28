@@ -1,6 +1,6 @@
 import Foundation
 
-enum AppLoadError {
+enum AppLoadError: Sendable {
     case noInternet
     case server
 

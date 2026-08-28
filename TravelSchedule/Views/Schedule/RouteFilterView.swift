@@ -4,11 +4,11 @@ struct RouteFilterView: View {
     let onApply: (ScheduleFilters) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var draft: ScheduleFilters
+    @StateObject private var viewModel: RouteFilterViewModel
 
     init(filters: ScheduleFilters, onApply: @escaping (ScheduleFilters) -> Void) {
         self.onApply = onApply
-        _draft = State(initialValue: filters)
+        _viewModel = StateObject(wrappedValue: RouteFilterViewModel(filters: filters))
     }
 
     var body: some View {
@@ -17,9 +17,9 @@ struct RouteFilterView: View {
             transfersSection
             Spacer()
             applyButton
-                .opacity(draft.isActive ? 1 : 0)
-                .disabled(!draft.isActive)
-                .accessibilityHidden(!draft.isActive)
+                .opacity(viewModel.draft.isActive ? 1 : 0)
+                .disabled(!viewModel.draft.isActive)
+                .accessibilityHidden(!viewModel.draft.isActive)
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)
@@ -41,14 +41,14 @@ struct RouteFilterView: View {
 
             ForEach(DepartureTimeSlot.allCases, id: \.self) { slot in
                 Button {
-                    toggle(slot)
+                    viewModel.toggle(slot)
                 } label: {
                     HStack {
                         Text(slot.title)
                             .font(.system(size: 17))
                             .foregroundStyle(AppColor.text)
                         Spacer()
-                        FilterCheckbox(isOn: draft.departureTimes.contains(slot))
+                        FilterCheckbox(isOn: viewModel.draft.departureTimes.contains(slot))
                     }
                     .frame(height: 44)
                     .contentShape(Rectangle())
@@ -71,14 +71,14 @@ struct RouteFilterView: View {
 
     private func transferRow(title: String, value: Bool) -> some View {
         Button {
-            draft.showTransfers = draft.showTransfers == value ? nil : value
+            viewModel.setShowTransfers(value)
         } label: {
             HStack {
                 Text(title)
                     .font(.system(size: 17))
                     .foregroundStyle(AppColor.text)
                 Spacer()
-                FilterRadio(isOn: draft.showTransfers == value)
+                FilterRadio(isOn: viewModel.draft.showTransfers == value)
             }
             .frame(height: 44)
             .contentShape(Rectangle())
@@ -88,7 +88,7 @@ struct RouteFilterView: View {
 
     private var applyButton: some View {
         Button {
-            onApply(draft)
+            onApply(viewModel.draft)
             dismiss()
         } label: {
             Text(AppStrings.apply)
@@ -100,14 +100,6 @@ struct RouteFilterView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
-    }
-
-    private func toggle(_ slot: DepartureTimeSlot) {
-        if draft.departureTimes.contains(slot) {
-            draft.departureTimes.remove(slot)
-        } else {
-            draft.departureTimes.insert(slot)
-        }
     }
 }
 

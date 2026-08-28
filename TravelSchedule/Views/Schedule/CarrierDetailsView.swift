@@ -10,12 +10,13 @@ struct CarrierDetailsView: View {
 
     var body: some View {
         Group {
-            if viewModel.isLoading && viewModel.details == nil {
+            switch viewModel.state {
+            case .idle, .loading:
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let details = viewModel.details {
+            case .loaded(let details):
                 detailsContent(details)
-            } else {
+            case .failed:
                 Color.clear
             }
         }
@@ -112,11 +113,7 @@ private struct CarrierDetailsLogo: View {
                 image = nil
                 return
             }
-            if let cached = CarrierImageCache.shared.image(for: url) {
-                image = cached
-                return
-            }
-            image = await CarrierImageCache.shared.image(from: url)
+            image = await CarrierImageCache.shared.loadImage(from: url)
         }
     }
 }

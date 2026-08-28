@@ -70,9 +70,11 @@ final class ScheduleBetweenStationsService: ScheduleBetweenStationsServiceProtoc
             throw URLError(.badServerResponse)
         }
 
-        return try await Task.detached(priority: .userInitiated) {
-            let decoded = try JSONDecoder().decode(RaspSearchDTO.self, from: data)
-            return (decoded.segments ?? []).compactMap(Trip.init)
-        }.value
+        return try Self.decodeTrips(from: data)
+    }
+
+    nonisolated private static func decodeTrips(from data: Data) throws -> [Trip] {
+        let decoded = try JSONDecoder().decode(RaspSearchDTO.self, from: data)
+        return (decoded.segments ?? []).compactMap(Trip.init)
     }
 }

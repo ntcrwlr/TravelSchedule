@@ -1,43 +1,27 @@
 import UIKit
 
-final class CarrierImageCache {
+actor CarrierImageCache {
     static let shared = CarrierImageCache()
 
-    private var images: [URL: UIImage] = [:]
-    private let lock = NSLock()
+    private var imageData: [URL: Data] = [:]
 
-    private init() {}
-
-    func image(for url: URL) -> UIImage? {
-        lock.lock()
-        defer { lock.unlock() }
-        return images[url]
+    func cachedImage(for url: URL) -> UIImage? {
+        guard let data = imageData[url] else { return nil }
+        return UIImage(data: data)
     }
 
-    func set(_ image: UIImage, for url: URL) {
-        lock.lock()
-        defer { lock.unlock() }
-        images[url] = image
-    }
-
-    func image(from url: URL) async -> UIImage? {
-        if let cached = image(for: url) {
+    func loadImage(from url: URL) async -> UIImage? {
+        if let cached = cachedImage(for: url) {
             return cached
         }
 
-        let loaded = await Task.detached(priority: .userInitiated) {
-            guard let (data, response) = try? await URLSession.shared.data(from: url),
-                  (response as? HTTPURLResponse)?.statusCode == HTTPStatusCode.ok,
-                  let image = UIImage(data: data)
-            else {
-                return nil as UIImage?
-            }
-            return image
-        }.value
-
-        if let loaded {
-            set(loaded, for: url)
+        guard let data = try? await NetworkClient.shared.downloadData(from: url),
+              let image = UIImage(data: data)
+        else {
+            return nil
         }
-        return loaded
+
+        imageData[url] = data
+        return image
     }
 }

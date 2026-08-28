@@ -5,32 +5,7 @@ enum UserAgreementLoader {
         string: "https://yandex.ru/legal/practicum_offer/ru/index.md"
     )!
 
-    static func loadMarkdown() async -> String {
-        if let remote = await fetchRemoteMarkdown() {
-            return sanitize(remote)
-        }
-        if let local = loadBundledMarkdown() {
-            return sanitize(local)
-        }
-        return ""
-    }
-
-    private static func fetchRemoteMarkdown() async -> String? {
-        do {
-            let (data, response) = try await URLSession.shared.data(from: remoteMarkdownURL)
-            guard (response as? HTTPURLResponse)?.statusCode == HTTPStatusCode.ok,
-                  let text = String(data: data, encoding: .utf8),
-                  !text.isEmpty
-            else {
-                return nil
-            }
-            return text
-        } catch {
-            return nil
-        }
-    }
-
-    private static func loadBundledMarkdown() -> String? {
+    static func loadBundledMarkdown() -> String? {
         guard let url = Bundle.main.url(forResource: "UserAgreement", withExtension: "md") else {
             return nil
         }

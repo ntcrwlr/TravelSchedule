@@ -1,6 +1,5 @@
 import Combine
 import Foundation
-import Network
 
 @MainActor
 final class AppErrorCenter: ObservableObject {
@@ -10,7 +9,7 @@ final class AppErrorCenter: ObservableObject {
 
     private var requestError: AppLoadError?
     private var isOffline = false
-    private let monitor = NWPathMonitor()
+    private var monitorTask: Task<Void, Never>?
 
     private init() {
         setupMonitor()
@@ -22,14 +21,13 @@ final class AppErrorCenter: ObservableObject {
     }
 
     private func setupMonitor() {
-        monitor.pathUpdateHandler = { [weak self] path in
-            let offline = path.status != .satisfied
-            Task { @MainActor in
-                self?.isOffline = offline
-                self?.publish()
+        monitorTask = Task { [weak self] in
+            for await isOnline in NetworkPathMonitor.connectivityUpdates() {
+                guard let self else { return }
+                isOffline = !isOnline
+                publish()
             }
         }
-        monitor.start(queue: DispatchQueue(label: "ru.practicum.travelschedule.network"))
     }
 
     private func publish() {

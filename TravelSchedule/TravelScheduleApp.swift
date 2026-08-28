@@ -23,15 +23,15 @@ struct TravelScheduleApp: App {
 }
 
 struct RootView: View {
-    @State private var isSplashVisible = true
+    @StateObject private var splashViewModel = SplashViewModel()
     @AppStorage(AppThemeStorage.isDarkThemeKey) private var isDarkTheme = false
 
     var body: some View {
         ZStack {
             MainTabView()
             SplashView()
-                .opacity(isSplashVisible ? 1 : 0)
-                .allowsHitTesting(isSplashVisible)
+                .opacity(splashViewModel.isVisible ? 1 : 0)
+                .allowsHitTesting(splashViewModel.isVisible)
         }
         .preferredColorScheme(isDarkTheme ? .dark : .light)
         .onAppear {
@@ -41,10 +41,7 @@ struct RootView: View {
             applyInterfaceStyle()
         }
         .task {
-            try? await Task.sleep(for: .seconds(2))
-            withAnimation(.easeOut(duration: 0.25)) {
-                isSplashVisible = false
-            }
+            await splashViewModel.runSplashSequence()
         }
     }
 

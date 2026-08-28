@@ -1,6 +1,6 @@
 import Foundation
 
-struct CarrierDetails: Hashable {
+struct CarrierDetails: Hashable, Sendable {
     let code: String
     let title: String
     let logoURL: URL?

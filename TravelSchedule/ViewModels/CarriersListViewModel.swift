@@ -44,17 +44,11 @@ final class CarriersListViewModel: ObservableObject {
         defer { isLoading = false }
 
         do {
-            let client = try NetworkClient.make()
-            let service = ScheduleBetweenStationsService(
-                client: client,
-                apikey: ApiKey.yandexRasp
-            )
-            trips = try await service.fetchTrips(
+            trips = try await NetworkClient.shared.fetchTrips(
                 from: from.id,
                 to: to.id,
                 date: Self.todayString()
             )
-            isLoading = false
             AppErrorCenter.shared.report(nil)
             await loadMissingLogos()
         } catch is CancellationError {
@@ -82,12 +76,9 @@ final class CarriersListViewModel: ObservableObject {
         await withTaskGroup(of: (String, URL?).self) { group in
             for code in codes {
                 group.addTask {
-                    let url = await CarrierService.fetchLogoURL(
-                        code: code,
-                        apikey: ApiKey.yandexRasp
-                    )
+                    let url = await NetworkClient.shared.fetchCarrierLogoURL(code: code)
                     if let url {
-                        _ = await CarrierImageCache.shared.image(from: url)
+                        _ = await CarrierImageCache.shared.loadImage(from: url)
                     }
                     return (code, url)
                 }

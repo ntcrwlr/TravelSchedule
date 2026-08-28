@@ -3,9 +3,7 @@ import Foundation
 
 @MainActor
 final class CarrierDetailsViewModel: ObservableObject {
-    @Published private(set) var details: CarrierDetails?
-    @Published private(set) var isLoading = false
-    @Published private(set) var loadError: AppLoadError?
+    @Published private(set) var state: CarrierDetailsState = .idle
 
     let carrierCode: String
 
@@ -14,20 +12,15 @@ final class CarrierDetailsViewModel: ObservableObject {
     }
 
     func load() async {
-        isLoading = true
-        loadError = nil
+        state = .loading
         AppErrorCenter.shared.report(nil)
-        defer { isLoading = false }
 
         do {
-            let details = try await CarrierService.fetchDetails(
-                code: carrierCode,
-                apikey: ApiKey.yandexRasp
-            )
+            let details = try await NetworkClient.shared.fetchCarrierDetails(code: carrierCode)
             if let logoURL = details.logoURL {
-                _ = await CarrierImageCache.shared.image(from: logoURL)
+                _ = await CarrierImageCache.shared.loadImage(from: logoURL)
             }
-            self.details = details
+            state = .loaded(details)
             AppErrorCenter.shared.report(nil)
         } catch is CancellationError {
             return
@@ -36,9 +29,8 @@ final class CarrierDetailsViewModel: ObservableObject {
                 return
             }
             let loadError = AppLoadError(error: error)
-            self.loadError = loadError
+            state = .failed(loadError)
             AppErrorCenter.shared.report(loadError)
-            details = nil
         }
     }
 }

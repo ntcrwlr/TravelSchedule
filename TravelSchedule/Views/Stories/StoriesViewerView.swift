@@ -34,6 +34,9 @@ struct StoriesViewerView: View {
             .ignoresSafeArea()
         }
         .statusBarHidden()
+        .task {
+            await viewModel.start()
+        }
         .onDisappear {
             viewModel.stopTimer()
         }

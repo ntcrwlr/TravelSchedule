@@ -63,7 +63,7 @@ private struct CarrierAvatar: View {
     @State private var image: UIImage?
 
     var body: some View {
-        let currentImage = displayedImage
+        let currentImage = image
         ZStack {
             RoundedRectangle(cornerRadius: 12)
                 .fill(AppColor.white)
@@ -84,16 +84,7 @@ private struct CarrierAvatar: View {
                 image = nil
                 return
             }
-            if let cached = CarrierImageCache.shared.image(for: url) {
-                image = cached
-                return
-            }
-            image = await CarrierImageCache.shared.image(from: url)
+            image = await CarrierImageCache.shared.loadImage(from: url)
         }
-    }
-
-    private var displayedImage: UIImage? {
-        guard let url else { return nil }
-        return CarrierImageCache.shared.image(for: url) ?? image
     }
 }

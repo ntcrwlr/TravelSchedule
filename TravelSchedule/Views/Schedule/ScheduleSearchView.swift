@@ -1,35 +1,30 @@
 import SwiftUI
 
 struct ScheduleSearchView: View {
-    @State private var from: RoutePoint?
-    @State private var to: RoutePoint?
+    @StateObject private var viewModel = ScheduleSearchViewModel()
     @State private var path = NavigationPath()
-    @StateObject private var carriersViewModel = CarriersListViewModel()
-    @ObservedObject private var storiesStore = StoriesStore.shared
-    @State private var presentedStoryID: Int?
-
-    private var canFind: Bool {
-        from != nil && to != nil
-    }
 
     private var isStoriesPresented: Binding<Bool> {
         Binding(
-            get: { presentedStoryID != nil },
-            set: { if !$0 { presentedStoryID = nil } }
+            get: { viewModel.isStoriesPresented },
+            set: { if !$0 { viewModel.closeStories() } }
         )
     }
 
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading, spacing: 16) {
-                StoriesStripView(store: storiesStore, stories: SampleStories.all) { storyID in
-                    presentedStoryID = storyID
+                StoriesStripView(
+                    store: viewModel.storiesStore,
+                    stories: SampleStories.all
+                ) { storyID in
+                    viewModel.openStory(id: storyID)
                 }
 
                 searchCard
                     .padding(.horizontal, 16)
 
-                if canFind {
+                if viewModel.canFind {
                     findButton
                         .frame(maxWidth: .infinity)
                 }
@@ -48,23 +43,15 @@ struct ScheduleSearchView: View {
                     CitySearchView(direction: direction)
                 case .stationSearch(let direction, let city):
                     StationSearchView(city: city) { station in
-                        let point = RoutePoint(
-                            id: station.id,
-                            title: "\(city.title) (\(station.title))"
-                        )
-                        switch direction {
-                        case .from:
-                            from = point
-                        case .to:
-                            to = point
-                        }
+                        let point = viewModel.makeRoutePoint(city: city, station: station)
+                        viewModel.setRoutePoint(point, direction: direction)
                         path.removeLast(min(2, path.count))
                     }
                 case .carriers:
-                    CarriersListView(viewModel: carriersViewModel, path: $path)
+                    CarriersListView(viewModel: viewModel.carriersViewModel, path: $path)
                 case .timeFilter:
-                    RouteFilterView(filters: carriersViewModel.filters) { applied in
-                        carriersViewModel.filters = applied
+                    RouteFilterView(filters: viewModel.carriersViewModel.filters) { applied in
+                        viewModel.carriersViewModel.filters = applied
                     }
                 case .carrierCard(let code):
                     CarrierDetailsView(carrierCode: code)
@@ -73,23 +60,23 @@ struct ScheduleSearchView: View {
             .fullScreenCover(isPresented: isStoriesPresented) {
                 StoriesViewerView(
                     stories: SampleStories.all,
-                    startIndex: presentedStoryID ?? 0,
+                    startIndex: viewModel.presentedStoryID ?? 0,
                     onStoryViewed: { storyID in
-                        storiesStore.markViewed(storyID)
+                        viewModel.storiesStore.markViewed(storyID)
                     },
                     onClose: {
-                        presentedStoryID = nil
+                        viewModel.closeStories()
                     }
                 )
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: canFind)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.canFind)
     }
 
     private var searchCard: some View {
         HStack(spacing: 16) {
             VStack(spacing: 0) {
-                stationRow(point: from, placeholder: AppStrings.from) {
+                stationRow(point: viewModel.from, placeholder: AppStrings.from) {
                     path.append(ScheduleRoute.citySearch(.from))
                 }
 
@@ -98,14 +85,14 @@ struct ScheduleSearchView: View {
                     .frame(height: 1)
                     .padding(.horizontal, 16)
 
-                stationRow(point: to, placeholder: AppStrings.to) {
+                stationRow(point: viewModel.to, placeholder: AppStrings.to) {
                     path.append(ScheduleRoute.citySearch(.to))
                 }
             }
             .background(AppColor.white)
             .clipShape(RoundedRectangle(cornerRadius: 20))
 
-            Button(action: swapStations) {
+            Button(action: viewModel.swapStations) {
                 Image(systemName: "arrow.2.circlepath")
                     .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(AppColor.blue)
@@ -122,7 +109,7 @@ struct ScheduleSearchView: View {
 
     private var findButton: some View {
         Button {
-            carriersViewModel.configure(from: from, to: to)
+            viewModel.prepareCarriersSearch()
             path.append(ScheduleRoute.carriers)
         } label: {
             Text(AppStrings.find)
@@ -151,12 +138,6 @@ struct ScheduleSearchView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-    }
-
-    private func swapStations() {
-        let currentFrom = from
-        from = to
-        to = currentFrom
     }
 }
 

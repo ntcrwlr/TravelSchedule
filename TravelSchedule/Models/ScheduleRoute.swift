@@ -1,6 +1,6 @@
 import Foundation
 
-enum ScheduleRoute: Hashable {
+enum ScheduleRoute: Hashable, Sendable {
     case citySearch(CitySearchDirection)
     case stationSearch(CitySearchDirection, City)
     case carriers
