@@ -17,7 +17,7 @@ struct RouteFilterView: View {
             transfersSection
             Spacer()
             applyButton
-                .opacity(viewModel.draft.isActive ? 1 : 0)
+                .hiddenWhen(!viewModel.draft.isActive)
                 .disabled(!viewModel.draft.isActive)
                 .accessibilityHidden(!viewModel.draft.isActive)
         }
@@ -114,11 +114,11 @@ private struct FilterCheckbox: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(AppColor.text)
                 .frame(width: 24, height: 24)
-                .opacity(isOn ? 1 : 0)
-            Image(systemName: "checkmark")
+                .hiddenWhen(!isOn)
+            Image(systemName: AppSymbol.checkmark)
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(AppColor.background)
-                .opacity(isOn ? 1 : 0)
+                .hiddenWhen(!isOn)
         }
     }
 }
@@ -134,7 +134,7 @@ private struct FilterRadio: View {
             Circle()
                 .fill(AppColor.text)
                 .frame(width: 10, height: 10)
-                .opacity(isOn ? 1 : 0)
+                .hiddenWhen(!isOn)
         }
     }
 }

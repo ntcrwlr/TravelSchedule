@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AppErrorOverlay: ViewModifier {
-    @ObservedObject private var errorCenter = AppErrorCenter.shared
+    @State private var errorCenter = AppErrorCenter.shared
 
     func body(content: Content) -> some View {
         content.overlay {

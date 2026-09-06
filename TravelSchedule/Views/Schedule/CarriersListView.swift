@@ -19,7 +19,7 @@ struct CarriersListView: View {
             refineButton
                 .padding(.horizontal, 16)
                 .padding(.bottom, 8)
-                .opacity(viewModel.isLoading ? 0 : 1)
+                .hiddenWhen(viewModel.isLoading)
                 .disabled(viewModel.isLoading)
         }
         .background(AppColor.background)
@@ -54,16 +54,16 @@ struct CarriersListView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 88)
             }
-            .opacity(isEmptyState || viewModel.isLoading ? 0 : 1)
+            .hiddenWhen(isEmptyState || viewModel.isLoading)
             .allowsHitTesting(!isEmptyState && !viewModel.isLoading)
 
             ProgressView()
-                .opacity(viewModel.isLoading ? 1 : 0)
+                .hiddenWhen(!viewModel.isLoading)
 
             Text(AppStrings.noVariants)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundStyle(AppColor.text)
-                .opacity(isEmptyState ? 1 : 0)
+                .hiddenWhen(!isEmptyState)
                 .allowsHitTesting(false)
         }
     }
@@ -83,7 +83,7 @@ struct CarriersListView: View {
                 Circle()
                     .fill(AppColor.red)
                     .frame(width: 8, height: 8)
-                    .opacity(viewModel.filters.isActive ? 1 : 0)
+                    .hiddenWhen(!viewModel.filters.isActive)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 60)

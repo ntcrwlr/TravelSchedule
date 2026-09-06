@@ -3,13 +3,7 @@ import OpenAPIRuntime
 import OpenAPIURLSession
 
 actor NetworkClient {
-    static let shared: NetworkClient = {
-        do {
-            return try NetworkClient(apikey: ApiKey.yandexRasp)
-        } catch {
-            fatalError("Failed to initialize NetworkClient: \(error)")
-        }
-    }()
+    static let shared = NetworkClient(apikey: ApiKey.yandexRasp)
 
     private let scheduleBetweenStationsService: ScheduleBetweenStationsService
     private let carrierService: CarrierService
@@ -20,9 +14,17 @@ actor NetworkClient {
     private let copyrightService: CopyrightService
     private let threadService: ThreadService
 
-    init(apikey: String) throws {
+    init(apikey: String) {
+        let serverURL: URL
+        do {
+            serverURL = try Servers.Server1.url()
+        } catch {
+            assertionFailure("Failed to resolve Yandex Rasp server URL: \(error)")
+            serverURL = URL(string: "https://api.rasp.yandex.net")!
+        }
+
         let client = Client(
-            serverURL: try Servers.Server1.url(),
+            serverURL: serverURL,
             transport: URLSessionTransport()
         )
         scheduleBetweenStationsService = ScheduleBetweenStationsService(client: client, apikey: apikey)

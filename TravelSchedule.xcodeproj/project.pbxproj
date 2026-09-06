@@ -32,6 +32,7 @@
 		954E8AE33028A58400C740EA /* TravelSchedule.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelSchedule.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		954E8AF03028A58600C740EA /* TravelScheduleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelScheduleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		954E8AFA3028A58600C740EA /* TravelScheduleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelScheduleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		95842F00304230000041567A /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -95,6 +96,7 @@
 		954E8ADA3028A58400C740EA = {
 			isa = PBXGroup;
 			children = (
+				95842F01304230000041567A /* Config */,
 				954E8AE53028A58400C740EA /* TravelSchedule */,
 				954E8AF33028A58600C740EA /* TravelScheduleTests */,
 				954E8AFD3028A58600C740EA /* TravelScheduleUITests */,
@@ -110,6 +112,14 @@
 				954E8AFA3028A58600C740EA /* TravelScheduleUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		95842F01304230000041567A /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				95842F00304230000041567A /* Secrets.xcconfig */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -427,6 +437,7 @@
 		};
 		954E8B053028A58600C740EA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 95842F00304230000041567A /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -452,7 +463,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
@@ -463,6 +474,7 @@
 		};
 		954E8B063028A58600C740EA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 95842F00304230000041567A /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -488,7 +500,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;

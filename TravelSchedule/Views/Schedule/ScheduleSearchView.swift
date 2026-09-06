@@ -93,7 +93,7 @@ struct ScheduleSearchView: View {
             .clipShape(RoundedRectangle(cornerRadius: 20))
 
             Button(action: viewModel.swapStations) {
-                Image(systemName: "arrow.2.circlepath")
+                Image(systemName: AppSymbol.swapStations)
                     .font(.system(size: 20, weight: .medium))
                     .foregroundStyle(AppColor.blue)
                     .frame(width: 36, height: 36)

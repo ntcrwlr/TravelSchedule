@@ -40,6 +40,7 @@ extension UIColor {
     }
 }
 
+@MainActor
 enum AppAppearance {
     static func configure() {
         let tab = UITabBarAppearance()

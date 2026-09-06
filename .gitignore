@@ -1,0 +1,8 @@
+# Local secrets with API keys — keep out of Git
+Config/Secrets.xcconfig
+
+# macOS / Xcode
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/

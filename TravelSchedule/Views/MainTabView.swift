@@ -5,14 +5,14 @@ struct MainTabView: View {
         TabView {
             ScheduleSearchView()
             .tabItem {
-                Image(systemName: "arrow.up.message.fill")
+                Image(systemName: AppSymbol.scheduleTab)
             }
 
             NavigationStack {
                 SettingsView()
             }
             .tabItem {
-                Image(systemName: "gearshape.fill")
+                Image(systemName: AppSymbol.settingsTab)
             }
         }
         .tint(AppColor.text)

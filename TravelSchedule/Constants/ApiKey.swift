@@ -1,3 +1,23 @@
+import Foundation
+
 enum ApiKey {
-    static let yandexRasp = "a26d6798-c48f-455f-9fc8-25bcec1ff9b4"
+    private static let infoPlistKey = "YandexRaspAPIKey"
+
+    static var yandexRasp: String {
+        guard
+            let key = Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String,
+            !key.isEmpty,
+            !key.hasPrefix("$(")
+        else {
+            assertionFailure(
+                """
+                Missing \(infoPlistKey) in Info.plist.
+                Copy Config/Secrets.xcconfig.example to Config/Secrets.xcconfig \
+                and set YANDEX_RASP_API_KEY.
+                """
+            )
+            return ""
+        }
+        return key
+    }
 }

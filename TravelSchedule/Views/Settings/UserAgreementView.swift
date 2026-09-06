@@ -14,10 +14,10 @@ struct UserAgreementView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
             }
-            .opacity(viewModel.isLoading ? 0 : 1)
+            .hiddenWhen(viewModel.isLoading)
 
             ProgressView()
-                .opacity(viewModel.isLoading ? 1 : 0)
+                .hiddenWhen(!viewModel.isLoading)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColor.background)

@@ -1,11 +1,12 @@
-import Combine
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-final class AppErrorCenter: ObservableObject {
+final class AppErrorCenter {
     static let shared = AppErrorCenter()
 
-    @Published private(set) var error: AppLoadError?
+    private(set) var error: AppLoadError?
 
     private var requestError: AppLoadError?
     private var isOffline = false

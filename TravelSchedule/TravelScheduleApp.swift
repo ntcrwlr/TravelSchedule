@@ -30,7 +30,7 @@ struct RootView: View {
         ZStack {
             MainTabView()
             SplashView()
-                .opacity(splashViewModel.isVisible ? 1 : 0)
+                .hiddenWhen(!splashViewModel.isVisible)
                 .allowsHitTesting(splashViewModel.isVisible)
         }
         .preferredColorScheme(isDarkTheme ? .dark : .light)

@@ -119,8 +119,10 @@ final class StoriesViewerViewModel: ObservableObject {
         restartTimer()
 
         for await date in Timer.publish(every: 1.0 / 30.0, on: .main, in: .common).autoconnect().values {
-            guard isActive else { return }
-            guard !isPaused, let startedAt else { continue }
+            guard isActive, !isPaused, let startedAt else {
+                if !isActive { return }
+                continue
+            }
 
             let elapsed = date.timeIntervalSince(startedAt)
             let value = min(1, CGFloat(elapsed / Self.pageDuration))

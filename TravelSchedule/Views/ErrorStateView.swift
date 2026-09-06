@@ -17,7 +17,7 @@ struct ErrorStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColor.background)
-        .opacity(error == nil ? 0 : 1)
+        .hiddenWhen(error == nil)
         .allowsHitTesting(error != nil)
     }
 }
