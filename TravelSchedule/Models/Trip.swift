@@ -1,6 +1,6 @@
 import Foundation
 
-struct Trip: Identifiable, Hashable {
+struct Trip: Identifiable, Hashable, Sendable {
     let id: String
     let carrierName: String
     let carrierCode: String?

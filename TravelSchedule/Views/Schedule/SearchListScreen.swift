@@ -18,7 +18,7 @@ struct SearchListScreen<Content: View>: View {
                     }
                 }
                 .scrollDismissesKeyboard(.immediately)
-                .opacity(isEmpty ? 0 : 1)
+                .hiddenWhen(isEmpty)
                 .allowsHitTesting(!isEmpty)
 
                 Text(emptyMessage)
@@ -26,7 +26,7 @@ struct SearchListScreen<Content: View>: View {
                     .foregroundStyle(AppColor.text)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 16)
-                    .opacity(isEmpty ? 1 : 0)
+                    .hiddenWhen(!isEmpty)
                     .allowsHitTesting(false)
             }
         }

@@ -1,6 +1,6 @@
 import Foundation
 
-enum CitySearchDirection: Hashable {
+enum CitySearchDirection: Hashable, Sendable {
     case from
     case to
 }

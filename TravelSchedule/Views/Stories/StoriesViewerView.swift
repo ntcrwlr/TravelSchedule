@@ -34,6 +34,9 @@ struct StoriesViewerView: View {
             .ignoresSafeArea()
         }
         .statusBarHidden()
+        .task {
+            await viewModel.start()
+        }
         .onDisappear {
             viewModel.stopTimer()
         }
@@ -97,7 +100,7 @@ struct StoriesViewerView: View {
                     Button {
                         close()
                     } label: {
-                        Image(systemName: "xmark")
+                        Image(systemName: AppSymbol.close)
                             .font(.system(size: 14, weight: .bold))
                             .foregroundStyle(AppColor.white)
                             .frame(width: 30, height: 30)

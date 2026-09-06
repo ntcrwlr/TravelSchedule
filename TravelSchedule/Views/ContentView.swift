@@ -43,33 +43,28 @@ struct ContentView: View {
 }
 
 func testAllServices() async throws {
-    let client = Client(
-        serverURL: try Servers.Server1.url(),
-        transport: URLSessionTransport()
-    )
-    let apikey = ApiKey.yandexRasp
+    let networkClient = NetworkClient.shared
 
-    try await testFetchNearestStations(client: client, apikey: apikey)
+    try await testFetchNearestStations(networkClient)
     try Task.checkCancellation()
-    try await testFetchStationsList(client: client, apikey: apikey)
+    try await testFetchStationsList(networkClient)
     try Task.checkCancellation()
-    try await testFetchScheduleBetweenStations(client: client, apikey: apikey)
+    try await testFetchScheduleBetweenStations(networkClient)
     try Task.checkCancellation()
-    try await testFetchScheduleOnStation(client: client, apikey: apikey)
+    try await testFetchScheduleOnStation(networkClient)
     try Task.checkCancellation()
-    try await testFetchThread(client: client, apikey: apikey)
+    try await testFetchThread(networkClient)
     try Task.checkCancellation()
-    try await testFetchCarrier(client: client, apikey: apikey)
+    try await testFetchCarrier(networkClient)
     try Task.checkCancellation()
-    try await testFetchCopyright(client: client, apikey: apikey)
+    try await testFetchCopyright(networkClient)
     try Task.checkCancellation()
-    try await testFetchNearestSettlement(client: client, apikey: apikey)
+    try await testFetchNearestSettlement(networkClient)
 }
 
-func testFetchNearestStations(client: Client, apikey: String) async throws {
-    let service = NearestStationsService(client: client, apikey: apikey)
+func testFetchNearestStations(_ networkClient: NetworkClient) async throws {
     print("Fetching nearest stations...")
-    let stations = try await service.getNearestStations(
+    let stations = try await networkClient.getNearestStations(
         lat: 59.864177,
         lng: 30.319163,
         distance: 50
@@ -77,55 +72,50 @@ func testFetchNearestStations(client: Client, apikey: String) async throws {
     print("Successfully fetched nearest stations: \(stations)")
 }
 
-func testFetchStationsList(client: Client, apikey: String) async throws {
-    let service = StationsListService(client: client, apikey: apikey)
+func testFetchStationsList(_ networkClient: NetworkClient) async throws {
     print("Fetching stations list...")
-    let stationsList = try await service.getStationsList()
+    let stationsList = try await networkClient.getStationsList()
     print("Successfully fetched stations list, countries count: \(stationsList.countries?.count ?? 0)")
 }
 
-func testFetchScheduleBetweenStations(client: Client, apikey: String) async throws {
-    let service = ScheduleBetweenStationsService(client: client, apikey: apikey)
+func testFetchScheduleBetweenStations(_ networkClient: NetworkClient) async throws {
     print("Fetching schedule between stations...")
-    let schedule = try await service.getScheduleBetweenStations(
+    let schedule = try await networkClient.getScheduleBetweenStations(
         from: "c146",
-        to: "c213"
+        to: "c213",
+        date: nil,
+        transfers: nil
     )
     print("Successfully fetched schedule between stations: \(schedule)")
 }
 
-func testFetchScheduleOnStation(client: Client, apikey: String) async throws {
-    let service = ScheduleOnStationService(client: client, apikey: apikey)
+func testFetchScheduleOnStation(_ networkClient: NetworkClient) async throws {
     print("Fetching schedule on station...")
-    let schedule = try await service.getScheduleOnStation(station: "s9600213")
+    let schedule = try await networkClient.getScheduleOnStation(station: "s9600213")
     print("Successfully fetched schedule on station: \(schedule)")
 }
 
-func testFetchThread(client: Client, apikey: String) async throws {
-    let service = ThreadService(client: client, apikey: apikey)
+func testFetchThread(_ networkClient: NetworkClient) async throws {
     print("Fetching thread...")
-    let thread = try await service.getThread(uid: "038AA_tis")
+    let thread = try await networkClient.getThread(uid: "038AA_tis")
     print("Successfully fetched thread: \(thread)")
 }
 
-func testFetchCarrier(client: Client, apikey: String) async throws {
-    let service = CarrierService(client: client, apikey: apikey)
+func testFetchCarrier(_ networkClient: NetworkClient) async throws {
     print("Fetching carrier...")
-    let carrier = try await service.getCarrier(code: "680")
+    let carrier = try await networkClient.getCarrier(code: "680")
     print("Successfully fetched carrier: \(carrier)")
 }
 
-func testFetchCopyright(client: Client, apikey: String) async throws {
-    let service = CopyrightService(client: client, apikey: apikey)
+func testFetchCopyright(_ networkClient: NetworkClient) async throws {
     print("Fetching copyright...")
-    let copyright = try await service.getCopyright()
+    let copyright = try await networkClient.getCopyright()
     print("Successfully fetched copyright: \(copyright)")
 }
 
-func testFetchNearestSettlement(client: Client, apikey: String) async throws {
-    let service = NearestSettlementService(client: client, apikey: apikey)
+func testFetchNearestSettlement(_ networkClient: NetworkClient) async throws {
     print("Fetching nearest settlement...")
-    let settlement = try await service.getNearestSettlement(
+    let settlement = try await networkClient.getNearestSettlement(
         lat: 50.440046,
         lng: 40.4882367
     )

@@ -1,24 +1,23 @@
 import SwiftUI
 
 struct UserAgreementView: View {
-    @State private var blocks: [IdentifiedAgreementBlock] = []
-    @State private var isLoading = true
+    @StateObject private var viewModel = UserAgreementViewModel()
 
     var body: some View {
         ZStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                    ForEach(blocks) { item in
+                    ForEach(viewModel.blocks) { item in
                         blockView(item.block)
                     }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
             }
-            .opacity(isLoading ? 0 : 1)
+            .hiddenWhen(viewModel.isLoading)
 
             ProgressView()
-                .opacity(isLoading ? 1 : 0)
+                .hiddenWhen(!viewModel.isLoading)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColor.background)
@@ -31,7 +30,7 @@ struct UserAgreementView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .tint(AppColor.text)
         .task {
-            await loadAgreement()
+            await viewModel.load()
         }
     }
 
@@ -89,21 +88,6 @@ struct UserAgreementView: View {
             }
         }
         return result
-    }
-
-    private func loadAgreement() async {
-        isLoading = true
-        AppErrorCenter.shared.report(nil)
-
-        let markdown = await UserAgreementLoader.loadMarkdown()
-        guard !markdown.isEmpty else {
-            isLoading = false
-            AppErrorCenter.shared.report(.server)
-            return
-        }
-
-        blocks = AgreementMarkdownParser.blocks(from: markdown)
-        isLoading = false
     }
 }
 

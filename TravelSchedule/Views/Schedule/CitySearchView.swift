@@ -3,27 +3,24 @@ import SwiftUI
 struct CitySearchView: View {
     let direction: CitySearchDirection
 
-    @State private var query = ""
-
-    private var filteredCities: [City] {
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return SampleLocations.cities }
-        return SampleLocations.cities.filter { $0.title.localizedCaseInsensitiveContains(trimmed) }
-    }
+    @StateObject private var viewModel = CitySearchViewModel()
 
     var body: some View {
         SearchListScreen(
             title: AppStrings.citySearchTitle,
             emptyMessage: AppStrings.cityNotFound,
-            isEmpty: filteredCities.isEmpty,
-            query: $query
+            isEmpty: viewModel.filteredCities.isEmpty,
+            query: $viewModel.query
         ) {
-            ForEach(filteredCities) { city in
+            ForEach(viewModel.filteredCities) { city in
                 NavigationLink(value: ScheduleRoute.stationSearch(direction, city)) {
                     SelectionRow(title: city.title)
                 }
                 .buttonStyle(.plainList)
             }
+        }
+        .task {
+            await viewModel.load()
         }
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-enum DepartureTimeSlot: String, CaseIterable, Hashable {
+enum DepartureTimeSlot: String, CaseIterable, Hashable, Sendable {
     case morning
     case day
     case evening
@@ -33,7 +33,7 @@ enum DepartureTimeSlot: String, CaseIterable, Hashable {
     }
 }
 
-struct ScheduleFilters: Equatable {
+struct ScheduleFilters: Equatable, Sendable {
     var departureTimes: Set<DepartureTimeSlot> = []
     var showTransfers: Bool?
 

@@ -63,19 +63,19 @@ private struct CarrierAvatar: View {
     @State private var image: UIImage?
 
     var body: some View {
-        let currentImage = displayedImage
+        let currentImage = image
         ZStack {
             RoundedRectangle(cornerRadius: 12)
                 .fill(AppColor.white)
             Text(String(name.prefix(1)).uppercased())
                 .font(.system(size: 14, weight: .bold))
                 .foregroundStyle(AppColor.blue)
-                .opacity(currentImage == nil ? 1 : 0)
+                .hiddenWhen(currentImage != nil)
             Image(uiImage: currentImage ?? UIImage())
                 .resizable()
                 .scaledToFit()
                 .padding(4)
-                .opacity(currentImage == nil ? 0 : 1)
+                .hiddenWhen(currentImage == nil)
         }
         .frame(width: 38, height: 38)
         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -84,16 +84,7 @@ private struct CarrierAvatar: View {
                 image = nil
                 return
             }
-            if let cached = CarrierImageCache.shared.image(for: url) {
-                image = cached
-                return
-            }
-            image = await CarrierImageCache.shared.image(from: url)
+            image = await CarrierImageCache.shared.loadImage(from: url)
         }
-    }
-
-    private var displayedImage: UIImage? {
-        guard let url else { return nil }
-        return CarrierImageCache.shared.image(for: url) ?? image
     }
 }

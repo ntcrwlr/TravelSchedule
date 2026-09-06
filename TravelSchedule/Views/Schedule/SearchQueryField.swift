@@ -6,7 +6,7 @@ struct SearchQueryField: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
+            Image(systemName: AppSymbol.search)
                 .foregroundStyle(AppColor.gray)
 
             TextField(AppStrings.searchPlaceholder, text: $text)
@@ -17,11 +17,11 @@ struct SearchQueryField: View {
             Button {
                 text = ""
             } label: {
-                Image(systemName: "xmark.circle.fill")
+                Image(systemName: AppSymbol.clearSearch)
                     .foregroundStyle(AppColor.gray)
             }
             .buttonStyle(.plain)
-            .opacity(isFocused || !text.isEmpty ? 1 : 0)
+            .hiddenWhen(!isFocused && text.isEmpty)
             .disabled(text.isEmpty)
         }
         .padding(.horizontal, 12)
@@ -43,7 +43,7 @@ struct SelectionRow: View {
                 .foregroundStyle(AppColor.text)
                 .lineLimit(1)
             Spacer()
-            Image(systemName: "chevron.right")
+            Image(systemName: AppSymbol.chevronRight)
                 .font(AppTypography.chevron)
                 .foregroundStyle(AppColor.gray)
         }

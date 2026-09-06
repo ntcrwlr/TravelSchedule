@@ -12,9 +12,9 @@ final class StoriesViewerViewModel: ObservableObject {
     @Published private(set) var pageIndex: Int = 0
     @Published private(set) var progress: CGFloat = 0
 
-    private var timer: AnyCancellable?
     private var startedAt: Date?
     private var isPaused = false
+    private var isActive = false
     private let onFinished: () -> Void
     private let onStoryViewed: (Int) -> Void
 
@@ -28,8 +28,6 @@ final class StoriesViewerViewModel: ObservableObject {
         self.storyIndex = min(max(startIndex, 0), max(stories.count - 1, 0))
         self.onStoryViewed = onStoryViewed
         self.onFinished = onFinished
-        markCurrentViewed()
-        startTimer()
     }
 
     var currentStory: Story {
@@ -44,6 +42,12 @@ final class StoriesViewerViewModel: ObservableObject {
         if page < pageIndex { return 1 }
         if page > pageIndex { return 0 }
         return progress
+    }
+
+    func start() async {
+        markCurrentViewed()
+        isActive = true
+        await runProgressLoop()
     }
 
     func showNext() {
@@ -61,8 +65,7 @@ final class StoriesViewerViewModel: ObservableObject {
             return
         }
 
-        stopTimer()
-        onFinished()
+        finish()
     }
 
     func showPrevious() {
@@ -84,8 +87,6 @@ final class StoriesViewerViewModel: ObservableObject {
 
     func pause() {
         isPaused = true
-        timer?.cancel()
-        timer = nil
     }
 
     func resume() {
@@ -93,12 +94,15 @@ final class StoriesViewerViewModel: ObservableObject {
         isPaused = false
         let remaining = max(0.05, Self.pageDuration * Double(1 - progress))
         startedAt = Date().addingTimeInterval(-(Self.pageDuration - remaining))
-        startTimer(resume: true)
     }
 
     func stopTimer() {
-        timer?.cancel()
-        timer = nil
+        isActive = false
+    }
+
+    private func finish() {
+        isActive = false
+        onFinished()
     }
 
     private func markCurrentViewed() {
@@ -108,28 +112,27 @@ final class StoriesViewerViewModel: ObservableObject {
     private func restartTimer() {
         progress = 0
         isPaused = false
-        startTimer()
+        startedAt = Date()
     }
 
-    private func startTimer(resume: Bool = false) {
-        timer?.cancel()
-        if !resume {
-            progress = 0
-            startedAt = Date()
-        } else if startedAt == nil {
-            startedAt = Date()
-        }
+    private func runProgressLoop() async {
+        restartTimer()
 
-        timer = Timer.publish(every: 1.0 / 30.0, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] date in
-                guard let self, let startedAt = self.startedAt, !self.isPaused else { return }
-                let elapsed = date.timeIntervalSince(startedAt)
-                let value = min(1, CGFloat(elapsed / Self.pageDuration))
-                self.progress = value
-                if value >= 1 {
-                    self.showNext()
+        for await date in Timer.publish(every: 1.0 / 30.0, on: .main, in: .common).autoconnect().values {
+            guard isActive, !isPaused, let startedAt else {
+                if !isActive { return }
+                continue
+            }
+
+            let elapsed = date.timeIntervalSince(startedAt)
+            let value = min(1, CGFloat(elapsed / Self.pageDuration))
+            progress = value
+            if value >= 1 {
+                showNext()
+                if !isActive {
+                    return
                 }
             }
+        }
     }
 }

@@ -25,11 +25,7 @@ final class CarrierService: CarrierServiceProtocol {
         return try response.ok.body.json
     }
 
-    static func fetchLogoURL(code: String, apikey: String) async -> URL? {
-        try? await fetchDetails(code: code, apikey: apikey).logoURL
-    }
-
-    static func fetchDetails(code: String, apikey: String) async throws -> CarrierDetails {
+    func fetchDetails(code: String) async throws -> CarrierDetails {
         var components = URLComponents(string: "https://api.rasp.yandex.net/v3.0/carrier/")
         components?.queryItems = [
             URLQueryItem(name: "apikey", value: apikey),
